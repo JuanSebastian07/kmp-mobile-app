@@ -75,50 +75,77 @@ jobs:
       
     - name: Clean project completely
       run: |
-        ./gradlew clean
+        echo "Starting complete clean..."
+        ./gradlew clean --stacktrace --info
         rm -rf build/
         rm -rf shared/build/
         rm -rf composeApp/build/
         rm -rf iosApp/build/
         rm -rf ~/.gradle/caches/
+        echo "Clean completed successfully"
         
-    - name: Check system info
+    - name: Check system info and dependencies
       run: |
+        echo "=== System Information ==="
         echo "Xcode version:"
         xcodebuild -version
         echo "Available iOS SDKs:"
         xcodebuild -showsdks | grep ios
-        echo "Kotlin Native targets:"
-        ./gradlew :shared:tasks --group="kotlin native" || echo "No kotlin native group found"
+        echo "Available simulators:"
+        xcrun simctl list devices available | head -20
+        echo "=== SQLite Check ==="
+        which sqlite3 || echo "sqlite3 not found in PATH"
+        ls -la /usr/lib/libsqlite3* 2>/dev/null || echo "libsqlite3 not found in /usr/lib"
+        echo "=== Gradle Tasks ==="
+        ./gradlew :shared:tasks --group="build" --stacktrace --info || echo "No build group found"
+        
+    - name: Install missing dependencies
+      run: |
+        echo "Installing SQLite3..."
+        brew install sqlite3 || echo "SQLite3 already installed"
+        echo "Checking installation..."
+        which sqlite3
+        sqlite3 --version
         
     - name: Build shared framework step by step
       run: |
-        echo "Building commonMain..."
-        ./gradlew :shared:compileKotlinMetadata --info
-        echo "Building iosMain..."
-        ./gradlew :shared:compileKotlinIosX64 --info
-        echo "Linking framework..."
-        ./gradlew :shared:linkDebugFrameworkIosX64 --info --stacktrace
+        echo "=== Building CommonMain ==="
+        ./gradlew :shared:compileKotlinMetadata --stacktrace --info
+        echo "=== Building iOS Main ==="
+        ./gradlew :shared:compileKotlinIosX64 --stacktrace --info
+        echo "=== Linking Framework ==="
+        ./gradlew :shared:linkDebugFrameworkIosX64 --stacktrace --info --debug
+        echo "=== Framework build completed ==="
+        
+    - name: Verify framework creation
+      run: |
+        echo "Checking if framework was created..."
+        find . -name "*.framework" -type d | head -10
+        ls -la shared/build/bin/iosX64/debugFramework/ || echo "Framework directory not found"
         
     - name: Build iOS App
       run: |
         cd iosApp
-        # Limpiar DerivedData
+        echo "=== Cleaning Xcode DerivedData ==="
         rm -rf ~/Library/Developer/Xcode/DerivedData
         
-        # Compilar con configuración más compatible
+        echo "=== Available simulators ==="
+        xcrun simctl list devices available | grep "iPhone"
+        
+        echo "=== Building iOS App ==="
         xcodebuild -project iosApp.xcodeproj \
           -scheme iosApp \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' \
+          -destination 'platform=iOS Simulator,name=iPhone 14' \
           -configuration Debug \
           clean build \
           CODE_SIGNING_ALLOWED=NO \
           CODE_SIGN_IDENTITY="" \
           PROVISIONING_PROFILE="" \
           OTHER_LDFLAGS="-lsqlite3" \
-          LIBRARY_SEARCH_PATHS="/usr/lib" \
-          HEADER_SEARCH_PATHS="/usr/include" \
-          -allowProvisioningUpdates
+          LIBRARY_SEARCH_PATHS="/usr/lib /opt/homebrew/lib" \
+          HEADER_SEARCH_PATHS="/usr/include /opt/homebrew/include" \
+          -allowProvisioningUpdates \
+          -verbose
           
     - name: Upload iOS App
       uses: actions/upload-artifact@v4
