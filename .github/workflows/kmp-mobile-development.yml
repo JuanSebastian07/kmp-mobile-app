@@ -1,11 +1,9 @@
 name: KMP Build and Test
-
 on:
   push:
     branches: [ master, develop ]
   pull_request:
     branches: [ master ]
-
 jobs:
   build-android:
     name: Build Android
@@ -64,18 +62,34 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./gradlew
       
+    - name: Clean build
+      run: ./gradlew clean
+      
+    - name: Build all iOS frameworks
+      run: |
+        ./gradlew :shared:linkDebugFrameworkIosX64
+        ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64
+        ./gradlew :shared:linkDebugFrameworkIosArm64
+      
     - name: Run iOS tests
       run: ./gradlew iosSimulatorArm64Test
       
-    - name: Build iOS Framework
-      run: ./gradlew linkDebugFrameworkIosSimulatorArm64
+    - name: Check if SQLite is available
+      run: |
+        echo "Checking SQLite availability..."
+        find /Applications/Xcode.app -name "libsqlite3*" -type f 2>/dev/null || echo "SQLite not found in Xcode"
+        ls -la /usr/lib/libsqlite3* 2>/dev/null || echo "SQLite not found in /usr/lib"
       
-    - name: Generate Xcode project
+    - name: Build iOS App
       run: |
         cd iosApp
-        # Listar simuladores disponibles para debug
+        # Listar simuladores disponibles
         xcrun simctl list devices available
-        # Compilar para cualquier simulador disponible
+        
+        # Limpiar DerivedData
+        rm -rf ~/Library/Developer/Xcode/DerivedData
+        
+        # Compilar con configuración explícita de SQLite
         xcodebuild -project iosApp.xcodeproj \
           -scheme iosApp \
           -destination 'generic/platform=iOS Simulator' \
@@ -83,7 +97,10 @@ jobs:
           clean build \
           CODE_SIGNING_ALLOWED=NO \
           CODE_SIGN_IDENTITY="" \
-          PROVISIONING_PROFILE=""
+          PROVISIONING_PROFILE="" \
+          OTHER_LDFLAGS="-lsqlite3" \
+          LIBRARY_SEARCH_PATHS="/usr/lib" \
+          HEADER_SEARCH_PATHS="/usr/include"
           
     - name: Upload iOS App
       uses: actions/upload-artifact@v4
