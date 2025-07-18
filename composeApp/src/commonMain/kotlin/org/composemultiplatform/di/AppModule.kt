@@ -1,8 +1,6 @@
 package org.composemultiplatform.di
 
 import org.composemultiplatform.data.ExpenseManager
-import org.composemultiplatform.data.repository.ExpenseRepositoryImpl
-import org.composemultiplatform.domain.repository.ExpenseRepository
 import org.composemultiplatform.domain.use_case.GetExpensesUseCase
 import org.composemultiplatform.presentation.expense.ExpensesViewModel
 import org.koin.core.module.dsl.createdAtStart
