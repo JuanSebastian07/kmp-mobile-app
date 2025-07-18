@@ -1,5 +1,4 @@
 name: KMP Build and Test
-
 on:
   push:
     branches: [ master, develop ]
@@ -22,16 +21,16 @@ jobs:
         distribution: 'temurin'
         
     - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
+      uses: gradle/actions/setup-gradle@v3
       
     - name: Make gradlew executable
       run: chmod +x ./gradlew
       
     - name: Run Android tests
-      run: ./gradlew testDebugUnitTest
+      run: ./gradlew :composeApp:testDebugUnitTest
       
     - name: Build Android APK
-      run: ./gradlew assembleDebug
+      run: ./gradlew :composeApp:assembleDebug
       
     - name: Upload Android APK
       uses: actions/upload-artifact@v4
@@ -59,23 +58,29 @@ jobs:
         xcode-version: latest-stable
         
     - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
+      uses: gradle/actions/setup-gradle@v3
       
     - name: Make gradlew executable
       run: chmod +x ./gradlew
       
     - name: Run iOS tests
-      run: ./gradlew iosSimulatorArm64Test
+      run: ./gradlew :composeApp:iosSimulatorArm64Test
       
     - name: Build iOS Framework
-      run: ./gradlew linkDebugFrameworkIosSimulatorArm64
+      run: |
+        echo "Building iOS framework with SQLite support..."
+        ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64
+        echo "Framework built successfully"
+        ls -la composeApp/build/bin/iosSimulatorArm64/debugFramework/ || echo "Framework not found"
       
-    - name: Generate Xcode project
+    - name: Build iOS App
       run: |
         cd iosApp
-        # Listar simuladores disponibles para debug
-        xcrun simctl list devices available
-        # Compilar para cualquier simulador disponible
+        echo "Available simulators:"
+        xcrun simctl list devices available | grep iPhone | head -5
+        echo "Cleaning derived data..."
+        rm -rf ~/Library/Developer/Xcode/DerivedData
+        echo "Building iOS app..."
         xcodebuild -project iosApp.xcodeproj \
           -scheme iosApp \
           -destination 'generic/platform=iOS Simulator' \
@@ -83,7 +88,8 @@ jobs:
           clean build \
           CODE_SIGNING_ALLOWED=NO \
           CODE_SIGN_IDENTITY="" \
-          PROVISIONING_PROFILE=""
+          PROVISIONING_PROFILE="" \
+          OTHER_LDFLAGS="-lsqlite3"
           
     - name: Upload iOS App
       uses: actions/upload-artifact@v4
