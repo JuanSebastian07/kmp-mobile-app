@@ -35,10 +35,10 @@ jobs:
       run: ./gradlew clean
 
     - name: Run Android tests
-      run: ./gradlew testDebugUnitTest
+      run: ./gradlew :composeApp:testDebugUnitTest
 
     - name: Build Android APK
-      run: ./gradlew assembleDebug
+      run: ./gradlew :composeApp:assembleDebug
 
     - name: Upload Android APK
       uses: actions/upload-artifact@v4
@@ -78,7 +78,6 @@ jobs:
         echo "Starting complete clean..."
         ./gradlew clean --stacktrace --info
         rm -rf build/
-        rm -rf shared/build/
         rm -rf composeApp/build/
         rm -rf iosApp/build/
         rm -rf ~/.gradle/caches/
@@ -97,7 +96,7 @@ jobs:
         which sqlite3 || echo "sqlite3 not found in PATH"
         ls -la /usr/lib/libsqlite3* 2>/dev/null || echo "libsqlite3 not found in /usr/lib"
         echo "=== Gradle Tasks ==="
-        ./gradlew :shared:tasks --group="build" --stacktrace --info || echo "No build group found"
+        ./gradlew :composeApp:tasks --group="build" --stacktrace --info || echo "No build group found"
 
     - name: Install missing dependencies
       run: |
@@ -110,18 +109,18 @@ jobs:
     - name: Build shared framework step by step
       run: |
         echo "=== Building CommonMain ==="
-        ./gradlew :shared:compileKotlinMetadata --stacktrace --info
+        ./gradlew :composeApp:compileKotlinMetadata --stacktrace --info
         echo "=== Building iOS Main ==="
-        ./gradlew :shared:compileKotlinIosX64 --stacktrace --info
+        ./gradlew :composeApp:compileKotlinIosX64 --stacktrace --info
         echo "=== Linking Framework ==="
-        ./gradlew :shared:linkDebugFrameworkIosX64 --stacktrace --info --debug
+        ./gradlew :composeApp:linkDebugFrameworkIosX64 --stacktrace --info --debug
         echo "=== Framework build completed ==="
 
     - name: Verify framework creation
       run: |
         echo "Checking if framework was created..."
         find . -name "*.framework" -type d | head -10
-        ls -la shared/build/bin/iosX64/debugFramework/ || echo "Framework directory not found"
+        ls -la composeApp/build/bin/iosX64/debugFramework/ || echo "Framework directory not found"
 
     - name: Build iOS App
       run: |
