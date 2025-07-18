@@ -4,6 +4,10 @@ on:
     branches: [ master, develop ]
   pull_request:
     branches: [ master ]
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.parallel=false"
+
 jobs:
   build-android:
     name: Build Android
@@ -20,10 +24,15 @@ jobs:
         distribution: 'temurin'
         
     - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-      
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        cache-disabled: true
+        
     - name: Make gradlew executable
       run: chmod +x ./gradlew
+      
+    - name: Clean project
+      run: ./gradlew clean
       
     - name: Run Android tests
       run: ./gradlew testDebugUnitTest
@@ -54,45 +63,53 @@ jobs:
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: latest-stable
+        xcode-version: '15.4'
         
     - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-      
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        cache-disabled: true
+        
     - name: Make gradlew executable
       run: chmod +x ./gradlew
       
-    - name: Clean build
-      run: ./gradlew clean
-      
-    - name: Build all iOS frameworks
+    - name: Clean project completely
       run: |
-        ./gradlew :shared:linkDebugFrameworkIosX64
-        ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64
-        ./gradlew :shared:linkDebugFrameworkIosArm64
-      
-    - name: Run iOS tests
-      run: ./gradlew iosSimulatorArm64Test
-      
-    - name: Check if SQLite is available
+        ./gradlew clean
+        rm -rf build/
+        rm -rf shared/build/
+        rm -rf composeApp/build/
+        rm -rf iosApp/build/
+        rm -rf ~/.gradle/caches/
+        
+    - name: Check system info
       run: |
-        echo "Checking SQLite availability..."
-        find /Applications/Xcode.app -name "libsqlite3*" -type f 2>/dev/null || echo "SQLite not found in Xcode"
-        ls -la /usr/lib/libsqlite3* 2>/dev/null || echo "SQLite not found in /usr/lib"
-      
+        echo "Xcode version:"
+        xcodebuild -version
+        echo "Available iOS SDKs:"
+        xcodebuild -showsdks | grep ios
+        echo "Kotlin Native targets:"
+        ./gradlew :shared:tasks --group="kotlin native" || echo "No kotlin native group found"
+        
+    - name: Build shared framework step by step
+      run: |
+        echo "Building commonMain..."
+        ./gradlew :shared:compileKotlinMetadata --info
+        echo "Building iosMain..."
+        ./gradlew :shared:compileKotlinIosX64 --info
+        echo "Linking framework..."
+        ./gradlew :shared:linkDebugFrameworkIosX64 --info --stacktrace
+        
     - name: Build iOS App
       run: |
         cd iosApp
-        # Listar simuladores disponibles
-        xcrun simctl list devices available
-        
         # Limpiar DerivedData
         rm -rf ~/Library/Developer/Xcode/DerivedData
         
-        # Compilar con configuración explícita de SQLite
+        # Compilar con configuración más compatible
         xcodebuild -project iosApp.xcodeproj \
           -scheme iosApp \
-          -destination 'generic/platform=iOS Simulator' \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' \
           -configuration Debug \
           clean build \
           CODE_SIGNING_ALLOWED=NO \
@@ -100,7 +117,8 @@ jobs:
           PROVISIONING_PROFILE="" \
           OTHER_LDFLAGS="-lsqlite3" \
           LIBRARY_SEARCH_PATHS="/usr/lib" \
-          HEADER_SEARCH_PATHS="/usr/include"
+          HEADER_SEARCH_PATHS="/usr/include" \
+          -allowProvisioningUpdates
           
     - name: Upload iOS App
       uses: actions/upload-artifact@v4
