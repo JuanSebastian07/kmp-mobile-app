@@ -7,6 +7,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    //
+    alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.sqlDelight)
 }
 
 kotlin {
@@ -33,9 +36,14 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            //
+            implementation(libs.sqlDelight.android)
+            implementation(libs.ktor.client.android)
+            implementation(libs.koin.android)
         }
         iosMain.dependencies {
-
+            implementation(libs.sqlDelight.ios)
+            implementation(libs.ktor.client.darwin)
         }
         
         commonMain.dependencies {
@@ -47,6 +55,23 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            //Icons
+            api(compose.materialIconsExtended)
+            //Navegacion Oficial
+            implementation(libs.navigation.compose)
+            //
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            //
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            //
+            implementation(libs.kotlinx.datetime)
+            //
+            implementation(libs.multiplatform.settings)
+            implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -83,5 +108,14 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+}
+
+//
+sqldelight {
+    databases {
+        create("AppDatabase"){
+            packageName.set("com.expenseApp.database")
+        }
+    }
 }
 
