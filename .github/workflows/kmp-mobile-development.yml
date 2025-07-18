@@ -67,13 +67,19 @@ jobs:
       run: ./gradlew :composeApp:iosSimulatorArm64Test
       
     - name: Build iOS Framework
-      run: ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64
+      run: |
+        echo "Building iOS framework with SQLite support..."
+        ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64
+        echo "Framework built successfully"
+        ls -la composeApp/build/bin/iosSimulatorArm64/debugFramework/ || echo "Framework not found"
       
     - name: Build iOS App
       run: |
         cd iosApp
         echo "Available simulators:"
         xcrun simctl list devices available | grep iPhone | head -5
+        echo "Cleaning derived data..."
+        rm -rf ~/Library/Developer/Xcode/DerivedData
         echo "Building iOS app..."
         xcodebuild -project iosApp.xcodeproj \
           -scheme iosApp \
@@ -82,7 +88,8 @@ jobs:
           clean build \
           CODE_SIGNING_ALLOWED=NO \
           CODE_SIGN_IDENTITY="" \
-          PROVISIONING_PROFILE=""
+          PROVISIONING_PROFILE="" \
+          OTHER_LDFLAGS="-lsqlite3"
           
     - name: Upload iOS App
       uses: actions/upload-artifact@v4
