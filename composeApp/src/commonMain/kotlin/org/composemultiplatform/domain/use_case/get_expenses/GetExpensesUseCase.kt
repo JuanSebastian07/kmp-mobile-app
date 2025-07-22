@@ -1,4 +1,4 @@
-package org.composemultiplatform.domain.use_case
+package org.composemultiplatform.domain.use_case.get_expenses
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -10,7 +10,7 @@ class GetExpensesUseCase(
     private val expenseRepository: ExpenseRepository
 ) {
     operator fun invoke() : Flow<UiState<List<Expense>>> = flow {
-        try{
+        try {
             emit(UiState.Loading())
             val expenses = expenseRepository.getExpenses()
             emit(UiState.Success(expenses))

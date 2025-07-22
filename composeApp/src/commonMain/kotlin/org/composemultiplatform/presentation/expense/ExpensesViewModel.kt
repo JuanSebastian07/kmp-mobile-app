@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 import org.composemultiplatform.core.UiState
-import org.composemultiplatform.domain.use_case.GetExpensesUseCase
+import org.composemultiplatform.domain.use_case.get_expenses.GetExpensesUseCase
 
 class ExpensesViewModel(
     private val getExpensesUseCase: GetExpensesUseCase

@@ -26,6 +26,11 @@ SET amount = ?,
     description = ?
 WHERE id = ?;
 
+selectById:
+SELECT *
+FROM ExpenseEntity
+WHERE id = ?;
+
 selectAll:
 SELECT *
 FROM ExpenseEntity;

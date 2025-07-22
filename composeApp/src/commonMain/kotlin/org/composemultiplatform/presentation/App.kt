@@ -4,11 +4,12 @@ import androidx.compose.runtime.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import org.composemultiplatform.presentation.detail.DetailScreen
 import org.composemultiplatform.presentation.expense.ExpenseScreen
 import org.composemultiplatform.presentation.ui.Theme.AppTheme
-import org.composemultiplatform.presentation.util.Detail
-import org.composemultiplatform.presentation.util.Expense
+import org.composemultiplatform.presentation.util.DetailRoute
+import org.composemultiplatform.presentation.util.ExpenseRoute
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -18,13 +19,14 @@ fun App() {
     AppTheme {
         NavHost(
             navController = navController,
-            startDestination = Expense
+            startDestination = ExpenseRoute
         ) {
-            composable<Expense> {
+            composable<ExpenseRoute> {
                 ExpenseScreen(navController = navController)
             }
 
-            composable<Detail> {
+            composable<DetailRoute> { entry ->
+                /*val id = entry.toRoute<DetailRoute>().expenseId*/
                 DetailScreen()
             }
         }

@@ -1,13 +1,11 @@
 package org.composemultiplatform.data.repository
 
 import com.expenseApp.database.AppDatabase
-import org.composemultiplatform.data.ExpenseManager
 import org.composemultiplatform.domain.model.Expense
 import org.composemultiplatform.domain.model.ExpenseCategory
 import org.composemultiplatform.domain.repository.ExpenseRepository
 
 class ExpenseRepositoryImpl (
-    private val expenseManager: ExpenseManager,
     appDatabase: AppDatabase
 ) : ExpenseRepository  {
 
@@ -20,6 +18,17 @@ class ExpenseRepositoryImpl (
                 amount = it.amount,
                 description = it.description,
                 category = ExpenseCategory.valueOf(it.categoryName)
+            )
+        }
+    }
+
+    override suspend fun getExpenseById(id: Long): Expense {
+        return queries.selectById(id).executeAsOne().let { entity ->
+            Expense(
+                id = entity.id,
+                amount = entity.amount,
+                description = entity.description,
+                category = ExpenseCategory.valueOf(entity.categoryName)
             )
         }
     }

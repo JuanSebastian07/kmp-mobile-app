@@ -11,5 +11,5 @@ val databaseModule = module {
         val driverFactory = get<DatabaseDriverFactory>()
         AppDatabase(driverFactory.createDriver())
     }
-    single<ExpenseRepository> { ExpenseRepositoryImpl(get(), get()) }
+    single<ExpenseRepository> { ExpenseRepositoryImpl(get()) }
 }

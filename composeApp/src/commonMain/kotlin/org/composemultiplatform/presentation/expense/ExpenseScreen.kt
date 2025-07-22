@@ -24,7 +24,7 @@ import org.composemultiplatform.presentation.expense.components.AllExpensesHeade
 import org.composemultiplatform.presentation.expense.components.ExpenseItem
 import org.composemultiplatform.presentation.expense.components.ExpensesTotalHeader
 import org.composemultiplatform.presentation.ui.Theme.customColors
-import org.composemultiplatform.presentation.util.Detail
+import org.composemultiplatform.presentation.util.DetailRoute
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -38,7 +38,7 @@ fun ExpenseScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate(Detail)
+                    navController.navigate(DetailRoute())
                 },
                 shape = CircleShape,
                 containerColor = MaterialTheme.customColors.addButtonColor,
@@ -73,7 +73,7 @@ fun ExpenseScreen(
             items(viewModel.uiState.value.expenses) { expense ->
                 ExpenseItem(
                     expense = expense, onExpenseClick = {
-                        navController.navigate(Detail)
+                        navController.navigate(DetailRoute(expenseId = expense.id))//*
                     }
                 )
             }

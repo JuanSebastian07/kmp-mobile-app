@@ -3,7 +3,7 @@ package org.composemultiplatform.presentation.util
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object Expense
+data object ExpenseRoute
 
 @Serializable
-data object Detail
+data class DetailRoute(val expenseId: Long? = null)
