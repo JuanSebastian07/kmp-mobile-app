@@ -21,6 +21,10 @@ class ExpensesViewModel(
         getExpenses()
     }
 
+    fun refreshExpenses() {
+        getExpenses()
+    }
+
     private fun getExpenses() {
         getExpensesUseCase().onEach { result ->
             when(result) {

@@ -16,18 +16,28 @@ fun DetailContent(
     keyboardController: SoftwareKeyboardController?,
     categorySelected: String,
     onCategoryClick: () -> Unit,
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
+    onAmountChange: (Double) -> Unit = {},
+    onDescriptionChange: (String) -> Unit = {},
+    isEditMode: Boolean
 ) {
+
+    val text = if (isEditMode) "Update Expense" else "Save Expense"
+    val currentAmount = expense?.amount ?: 0.0
+    val currentDescription = expense?.description.orEmpty()
+
     Column(modifier = modifier) {
         ExpenseAmount(
             keyboardController = keyboardController,
-            amount = expense?.amount ?: 0.0
-        )
+            amount = currentAmount
+        ){
+            onAmountChange(it)
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         ExpenseTypeSelector(
-            categorySelected = expense?.category?.name ?: categorySelected,
+            categorySelected = categorySelected,
             onCategorySelected = onCategoryClick
         )
 
@@ -35,12 +45,15 @@ fun DetailContent(
 
         ExpenseDescription(
             keyboardController = keyboardController,
-            description = expense?.description ?: ""
-        )
+            description = currentDescription
+        ){
+            onDescriptionChange(it)
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         ExpenseButton(
+            text = text,
             onClick = onSaveClick
         )
     }

@@ -27,7 +27,7 @@ import org.composemultiplatform.presentation.ui.Theme.customColors
 @Composable
 fun ExpenseTypeSelector(
     categorySelected: String = "",
-    onCategorySelected: () -> Unit
+    onCategorySelected: () -> Unit,
 ) {
     val colors = MaterialTheme.customColors
 

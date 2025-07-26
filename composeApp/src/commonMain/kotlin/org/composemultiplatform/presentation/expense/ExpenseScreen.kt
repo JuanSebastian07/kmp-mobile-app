@@ -16,7 +16,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,11 +35,21 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ExpenseScreen(
     navController: NavController,
-    viewModel: ExpensesViewModel = koinViewModel()
+    viewModel: ExpensesViewModel = koinViewModel(),
+    snackbarHostState: SnackbarHostState
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
+
+
+    val backStackEntry = navController.currentBackStackEntry
+    LaunchedEffect(backStackEntry?.id) {
+        viewModel.refreshExpenses()
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -66,11 +81,11 @@ fun ExpenseScreen(
                     modifier = Modifier.background(MaterialTheme.colorScheme.background)
                         .padding(top = 8.dp)
                 ) {
-                    ExpensesTotalHeader(viewModel.uiState.value.total)
+                    ExpensesTotalHeader(uiState.total)
                     AllExpensesHeader()
                 }
             }
-            items(viewModel.uiState.value.expenses) { expense ->
+            items(uiState.expenses) { expense ->
                 ExpenseItem(
                     expense = expense, onExpenseClick = {
                         navController.navigate(DetailRoute(expenseId = expense.id))//*

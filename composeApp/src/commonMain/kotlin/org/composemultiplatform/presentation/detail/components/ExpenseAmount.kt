@@ -11,6 +11,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,9 +29,11 @@ import org.composemultiplatform.presentation.ui.Theme.customColors
 @Composable
 fun ExpenseAmount(
     keyboardController: SoftwareKeyboardController?,
-    amount: Double = 0.0
+    amount: Double = 0.0,
+    onAmountChange: (Double) -> Unit = {}
 ) {
     val colors = MaterialTheme.customColors
+    var amountText by remember { mutableStateOf(if (amount == 0.0) "" else amount.toString()) }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -43,10 +49,14 @@ fun ExpenseAmount(
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextField(
                 modifier = Modifier.weight(1f),
-                value = amount.toString(),
+                value = amountText,
                 onValueChange = { newText ->
                     val numericText = newText.filter { it.isDigit() || it == '.' }
-
+                    if (numericText.count { it == '.' } <= 1) {
+                        amountText = numericText
+                        val doubleValue = numericText.toDoubleOrNull() ?: 0.0
+                        onAmountChange(doubleValue)
+                    }
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number,

@@ -16,7 +16,7 @@ import org.composemultiplatform.presentation.ui.Theme.customColors
 
 @Composable
 fun ExpenseButton(
-    text: String = "Save Expense",
+    text: String,
     onClick: () -> Unit
 ) {
     val colors = MaterialTheme.customColors

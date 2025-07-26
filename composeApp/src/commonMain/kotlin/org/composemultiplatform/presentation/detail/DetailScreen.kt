@@ -27,18 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.composemultiplatform.domain.model.Expense
 import org.composemultiplatform.domain.model.ExpenseCategory
 import org.composemultiplatform.presentation.detail.components.CategoryBottomSheetContent
 import org.composemultiplatform.presentation.detail.components.DetailContent
-import org.composemultiplatform.presentation.detail.components.ExpenseAmount
-import org.composemultiplatform.presentation.detail.components.ExpenseButton
-import org.composemultiplatform.presentation.detail.components.ExpenseDescription
-import org.composemultiplatform.presentation.detail.components.ExpenseTypeSelector
 import org.composemultiplatform.presentation.ui.Theme.customColors
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -85,24 +79,31 @@ private fun ErrorContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
-    viewModel: DetailViewModel = koinViewModel()
+    viewModel: DetailViewModel = koinViewModel(),
+    onNavigateBack: () -> Unit = {}
 ) {
     val colors = MaterialTheme.customColors
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
-
-
     val uiState by viewModel.uiState.collectAsState()
-
+    val isEditMode = uiState.expense != null
+    var amountText by remember { mutableStateOf(0.0) }
+    var descriptionText by remember { mutableStateOf("") }
     var categorySelected by remember {
-        mutableStateOf(uiState.expense?.category ?: "Selecciona una categoría")
+        mutableStateOf(ExpenseCategory.OTHER)
     }
 
+    LaunchedEffect(uiState.expense) {
+        if (isEditMode && uiState.expense != null) {
+            amountText = uiState.expense!!.amount
+            descriptionText = uiState.expense!!.description
+            categorySelected = uiState.expense!!.category
+        }
+    }
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
-
 
     LaunchedEffect(sheetState.currentValue) {
         if (sheetState.targetValue == SheetValue.Expanded) {
@@ -110,15 +111,15 @@ fun DetailScreen(
         }
     }
 
-    LaunchedEffect(uiState.expense?.category) {
-        uiState.expense?.category?.let {
-            categorySelected = it
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            onNavigateBack()
         }
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = colors.colorTint
+        containerColor = colors.colorTint,
     ) { innerPadding ->
         when {
             uiState.isLoading -> {
@@ -144,13 +145,27 @@ fun DetailScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                         .padding(16.dp),
+                    isEditMode = isEditMode,
                     expense = uiState.expense,
                     keyboardController = keyboardController,
                     categorySelected = categorySelected.toString(),
                     onCategoryClick = {
                         scope.launch { sheetState.show() }
                     },
-                    onSaveClick = { }
+                    onSaveClick = {
+                        if (isEditMode){
+                            viewModel.updateExpense(amountText, descriptionText, categorySelected)
+
+                        }else{
+                            viewModel.addExpense(amountText, descriptionText, categorySelected)
+                        }
+                    },
+                    onAmountChange = {
+                        amountText = it
+                    },
+                    onDescriptionChange = {
+                        descriptionText = it
+                    }
                 )
             }
         }
@@ -160,12 +175,11 @@ fun DetailScreen(
         sheetState = sheetState,
         isVisible = sheetState.isVisible,
         onCategorySelected = { category ->
-            categorySelected = category.name
+            categorySelected = category
             scope.launch { sheetState.hide() }
         }
     )
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -177,7 +191,7 @@ private fun CategoryBottomSheet(
 ) {
     if (isVisible) {
         ModalBottomSheet(
-            onDismissRequest = {  },
+            onDismissRequest = { },
             sheetState = sheetState,
             containerColor = MaterialTheme.colorScheme.background,
         ) {
