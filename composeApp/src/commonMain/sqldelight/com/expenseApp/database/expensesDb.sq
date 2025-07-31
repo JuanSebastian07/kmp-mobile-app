@@ -5,16 +5,6 @@ CREATE TABLE ExpenseEntity (
     description TEXT NOT NULL
 );
 
-INSERT INTO ExpenseEntity (amount, categoryName, description)
-VALUES
-(70.0, 'GROCERIES', 'Weekly buy'),
-(10.2, 'SNACK','Homies'),
-(90.2, 'CAR','Audi A1'),
-(80.2, 'COFFEE','Beans and cream'),
-(190.2, 'ENTERTAINMENT','Weekend party'),
-(1560.2, 'HOUSE','Expenses'),
-(1068.2, 'OTHER','Cleaning');
-
 insert:
 INSERT INTO ExpenseEntity(amount, categoryName, description)
 VALUES (?, ?, ?);
