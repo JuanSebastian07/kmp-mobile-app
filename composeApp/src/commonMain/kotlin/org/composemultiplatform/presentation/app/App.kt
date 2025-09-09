@@ -1,12 +1,7 @@
 package org.composemultiplatform.presentation.app
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,7 +12,6 @@ import org.composemultiplatform.presentation.ui.Theme.AppTheme
 import org.composemultiplatform.presentation.util.DetailRoute
 import org.composemultiplatform.presentation.util.ExpenseRoute
 import org.composemultiplatform.presentation.util.SignInRoute
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
