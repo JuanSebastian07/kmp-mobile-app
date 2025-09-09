@@ -45,7 +45,6 @@ import org.composemultiplatform.presentation.ui.Theme.customColors
 import org.composemultiplatform.presentation.util.DetailRoute
 import org.koin.compose.viewmodel.koinViewModel
 
-
 @Composable
 fun ExpenseScreen(
     navController: NavController,
@@ -54,7 +53,6 @@ fun ExpenseScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
-
 
     val backStackEntry = navController.currentBackStackEntry
     LaunchedEffect(backStackEntry?.id) {

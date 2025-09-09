@@ -26,15 +26,5 @@ fun AllExpensesHeader() {
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.customColors.colorText
         )
-        Button(
-            shape = RoundedCornerShape(20.dp),
-            onClick = { /*TODO*/ },
-        ) {
-            Text(
-                text = "Add",
-                color = MaterialTheme.customColors.addButtonColor
-            )
-        }
-
     }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "770235874286",
+    "project_id": "compose-multiplatform-913ed",
+    "storage_bucket": "compose-multiplatform-913ed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770235874286:android:64a4149e261f54256d6cff",
+        "android_client_info": {
+          "package_name": "org.composemultiplatform"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDr6e5l7MOUbjvpljnzkN6sIsdKyTA0LRg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

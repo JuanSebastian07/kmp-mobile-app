@@ -2,6 +2,11 @@ package org.composemultiplatform.presentation.util
 
 import kotlinx.serialization.Serializable
 
+
+@Serializable
+data object SignInRoute
+
+
 @Serializable
 data object ExpenseRoute
 

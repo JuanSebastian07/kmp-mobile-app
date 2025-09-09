@@ -10,6 +10,9 @@ plugins {
     //
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.sqlDelight)
+    //
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.kotlin.cocoapods)
 }
 
 kotlin {
@@ -41,6 +44,11 @@ kotlin {
             implementation(libs.sqlDelight.android)
             implementation(libs.ktor.client.android)
             implementation(libs.koin.android)
+            //Firebase
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.auth)
+            //
+            implementation(libs.androidx.core.splashscreen)
         }
         iosMain.dependencies {
             implementation(libs.sqlDelight.ios)
@@ -78,6 +86,29 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
+
+    cocoapods {
+        version = "1.0.0"
+        summary = "Expense App"
+        homepage = "https://github.com/juansebastian/kmp-mobile-app"
+        ios.deploymentTarget = "18.2"//Aqui toca poner la version minima que va soportar ios, pero es mejor revisarlo cuando estemos en xcode
+
+        framework {
+            baseName = "composeApp"
+            isStatic = true
+        }
+
+        //Aqui podemos poner las dependecias
+        pod("FirebaseCore"){
+            extraOpts += listOf("-compiler-option","-fmodules")
+        }
+
+        pod("FirebaseAuth"){
+            extraOpts += listOf("-compiler-option","-fmodules")
+        }
+
+    }
+
 }
 
 android {
@@ -85,7 +116,7 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "org.composemultiplatform"
+            applicationId = "org.composemultiplatform"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

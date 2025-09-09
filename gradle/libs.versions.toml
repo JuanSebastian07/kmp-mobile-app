@@ -12,7 +12,7 @@ androidx-lifecycle = "2.9.0"
 androidx-testExt = "1.2.1"
 composeMultiplatform = "1.8.2"
 junit = "4.13.2"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 kotlinxCoroutinesCore = "1.10.2"
 navigationCompose = "2.9.0-beta03"
 #sqlDelight
@@ -21,6 +21,9 @@ koin = "4.1.0"
 ktor = "3.2.1"
 sqlDelight = "2.1.0"
 settings = "1.2.0"
+firebase = "33.5.1"
+google-services = "4.4.3"
+coreSplashscreen = "1.0.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -39,22 +42,23 @@ navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-co
 #sqlDelight
 sqlDelight-android = {module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight"}
 sqlDelight-ios = {module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight"}
-
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
 #multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-noarg", version.ref = "settings" }
-
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
-
+#Koin
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+#Firebase
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
+firebase-auth = { module = "com.google.firebase:firebase-auth-ktx" }
+androidx-core-splashscreen = {module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -65,3 +69,7 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 #sqlDelight
 kotlinxSerialization = {id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
 sqlDelight = {id = "app.cash.sqldelight", version.ref = "sqlDelight"}
+#google service for firebase
+google-services = {id = "com.google.gms.google-services", version.ref = "google-services"}
+#Cocoapods
+kotlin-cocoapods = {id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin"}
