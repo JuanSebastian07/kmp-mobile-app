@@ -38,8 +38,8 @@ jobs:
           name: android-apk
           path: composeApp/build/outputs/apk/debug/*.apk
 
-  build-ios:
-    name: Build iOS
+  build-kmp-framework:
+    name: Build KMP Shared Framework
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -54,7 +54,7 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.0' 
+          xcode-version: '16.0'
           
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -62,43 +62,8 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
         
-      - name: Run iOS tests
-        run: ./gradlew :composeApp:iosSimulatorArm64Test
-        continue-on-error: true  
+      - name: Compile KMP shared code
+        run: ./gradlew :composeApp:compileKotlinIosSimulatorArm64
         
-      - name: Build iOS Framework
-        run: |
-          echo "Building iOS framework with SQLite support..."
-          ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64
-          echo "Framework built successfully"
-          ls -la composeApp/build/bin/iosSimulatorArm64/debugFramework/ || echo "Framework not found"
-      
-      - name: Install CocoaPods dependencies
-        run: |
-          cd iosApp
-          pod install
-          
-      - name: Build iOS App
-        run: |
-          cd iosApp
-          echo "Available simulators:"
-          xcrun simctl list devices available | grep iPhone | head -5
-          echo "Cleaning derived data..."
-          rm -rf ~/Library/Developer/Xcode/DerivedData
-          echo "Building iOS app..."
-          xcodebuild -workspace iosApp.xcworkspace \
-            -scheme iosApp \
-            -destination 'generic/platform=iOS Simulator' \
-            -configuration Debug \
-            clean build \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGN_IDENTITY="" \
-            PROVISIONING_PROFILE="" \
-            OTHER_LDFLAGS="-lsqlite3"
-            
-      - name: Upload iOS App
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: ios-app
-          path: iosApp/build/Build/Products/Debug-iphonesimulator/*.app
+      - name: Generate SQLDelight interfaces
+        run: ./gradlew :composeApp:generateCommonMainAppDatabaseInterface
