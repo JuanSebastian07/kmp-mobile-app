@@ -39,7 +39,7 @@ Este proyecto incluye una configuración de CI/CD con GitHub Actions para compil
 
     ☁️ Carga de artefactos (.apk y .app) como resultados del pipeline.
 
-<a href="https://www.youtube.com/watch?v=uU6ULXVh77M" target="_blank">
+<a href="https://www.youtube.com/watch?v=uU6ULXVh77M](https://www.youtube.com/watch?v=6aoqNUxcWb4" target="_blank">
   <img src="https://github.com/JuanSebastian07/kmp-mobile-app/blob/master/Screenshots/android-ios-kmp-ui.png" alt="Descripción del Video" width="640" height="426" />
 </a>
 
